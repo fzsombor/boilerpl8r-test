@@ -5,7 +5,7 @@ BRANCH_NAME := $(shell git rev-parse --abbrev-ref HEAD | sed 's/[^a-zA-Z0-9\-\.]
 LATEST_COMMIT_HASH := $(shell git log -1 --oneline | cut -d' ' -f1)
 IMAGE_TAG  := $(IMAGE_BASE):$(BRANCH_NAME)-$(LATEST_COMMIT_HASH)
 LATEST_TAG := $(IMAGE_BASE):latest
-PROD_JOB_MANAGER := JOB_MANAGER_SUBDOMAIN.example.net
+R_PROD_JOB_MANAGER := JOB_MANAGER_SUBDOMAIN.example.net
 
 
 .PHONY:	build
