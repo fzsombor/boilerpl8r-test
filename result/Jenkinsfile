@@ -1,6 +1,6 @@
 
-def REPO_URL = "https://github.example.net/flink-assignment/repo_name"
-def SLACK_CHANNEL = "#flink_assignment"
+def R_REPO_URL = "https://github.example.net/flink-assignment/repo_name"
+def R_SLACK_CHANNEL = "#flink_assignment"
 
 pipeline {
     agent { label 'docker' }
@@ -21,11 +21,11 @@ pipeline {
                 steps {
                     script {
                         shortChangelog = sh(returnStdout: true, script: 'git log -1 --pretty="%s by the wonderful %an"').trim()
-                        commitURL      = sh(returnStdout: true, script: "git log -1 --pretty='${REPO_URL}/commit/%H'").trim()
+                        commitURL      = sh(returnStdout: true, script: "git log -1 --pretty='${R_REPO_URL}/commit/%H'").trim()
                     }
                     slackSend(
-                            channel: SLACK_CHANNEL,
-                            message: "New <${commitURL}|${REPO_URL} code> has hit main! *${shortChangelog}!*.\nI'm going to build the docker image <${env.JOB_URL}|:jenkins:>"
+                            channel: R_SLACK_CHANNEL,
+                            message: "New <${commitURL}|${R_REPO_URL} code> has hit main! *${shortChangelog}!*.\nI'm going to build the docker image <${env.JOB_URL}|:jenkins:>"
                     )
                 }
             }
