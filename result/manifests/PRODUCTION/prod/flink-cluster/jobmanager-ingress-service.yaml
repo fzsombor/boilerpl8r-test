@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: nginx
+  creationTimestamp: null
+  labels:
+    app: flink
+    cluster: repo_name-cluster
+    component: jobmanager
+    track: prod
+  name: ingress-repo_name-cluster-service-prod
+  namespace: flink-assignment
+spec:
+  rules:
+  - host: repo_name-cluster.production.ingress.example.net
+    http:
+      paths:
+      - backend:
+          service:
+            name: repo_name-cluster-jobmanager-prod
+            port:
+              number: 8081
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - repo_name-cluster.production.ingress.example.net
+status:
+  loadBalancer: {}

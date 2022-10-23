@@ -1,0 +1,47 @@
+
+def REPO_URL = "https://github.example.net/flink-assignment/repo_name"
+def SLACK_CHANNEL = "#flink_assignment"
+
+pipeline {
+    agent { label 'docker' }
+
+    environment {
+        GIT_CREDS = credentials('a056092b-8c32-482e-a445-1673045c5f3d')
+        NEXUS_CREDS = credentials('nexus3')
+        GIT_REPO_URL = "https://github.example.net/flink-assignment/repo_name.git"
+        MAIN_IMAGE_TAG = sh(returnStdout: true, script: 'git describe --always --tags HEAD').trim()
+        IMAGE_TAG = "registry.example.net/flink-assignment/repo_name:latest"
+        GIT_COMMIT = sh(returnStdout:true, script: 'git rev-parse HEAD').trim()
+        GIT_TAG = sh(returnStdout:true, script: 'git describe --contains $(git rev-parse HEAD) 2>/dev/null || echo "no"').trim()
+    }
+
+    stages {
+            stage('Notify ‼️') {
+                when { branch 'main' }
+                steps {
+                    script {
+                        shortChangelog = sh(returnStdout: true, script: 'git log -1 --pretty="%s by the wonderful %an"').trim()
+                        commitURL      = sh(returnStdout: true, script: "git log -1 --pretty='${REPO_URL}/commit/%H'").trim()
+                    }
+                    slackSend(
+                            channel: SLACK_CHANNEL,
+                            message: "New <${commitURL}|${REPO_URL} code> has hit main! *${shortChangelog}!*.\nI'm going to build the docker image <${env.JOB_URL}|:jenkins:>"
+                    )
+                }
+            }
+            stage ('Push new image & Deploy cluster') {
+                when {
+                    branch "main"
+                }
+                steps {
+                    script {
+                        sh "make push"
+                    }
+                    script {
+                        sh "make deploy-prod-cluster"
+                    }
+                }
+            }
+
+    }
+}

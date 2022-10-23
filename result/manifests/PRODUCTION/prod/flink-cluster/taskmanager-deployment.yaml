@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo_name-cluster-taskmanager-prod
+  namespace: flink-assignment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: flink
+      cluster: repo_name-cluster
+      component: taskmanager
+      track: prod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: flink
+        cluster: repo_name-cluster
+        component: taskmanager
+        track: prod
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 2
+          topologyKey: "kubernetes.io/hostname"
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: "flink"
+              cluster: "repo_name-cluster"
+              track: "prod"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - flink
+                  - key: cluster
+                    operator: In
+                    values:
+                      - repo_name-cluster
+                  - key: track
+                    operator: In
+                    values:
+                      - prod
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: taskmanager
+        imagePullPolicy: Always
+        image: _DOCKER_IMAGE_TAG_
+        args: ["taskmanager"]
+        resources:
+          requests:
+            cpu: "400.0"
+            memory: "400Gi"
+          limits:
+            cpu: "400.0"
+            memory: "400Gi"
+        env:
+        - name: JOB_MANAGER_RPC_ADDRESS
+          value: repo_name-cluster-jobmanager-prod
+        - name: TRACK
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['track']
+        - name: TASK_MANAGER_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: HADOOP_USER_NAME
+          value: yarn
+        - name: HADOOP_CONF_DIR
+          value: "/etc/hadoop/conf"
+        - name: TASK_MANAGER_NUMBER_OF_TASK_SLOTS
+          value: "8"
+        - name: TOTAL_MEMORY_MiB
+          valueFrom:
+            resourceFieldRef:
+              containerName: taskmanager
+              resource: limits.memory
+              divisor: 1Mi
+        - name: OFF_HEAP_JVM_METASPACE
+          value: "256"
+        - name: OFF_HEAP_JVM_OVERHEAD
+          value: "32"
+        - name: OFF_HEAP_MANAGED_FLINK_MEMORY
+          value: "0"
+        - name: OFF_HEAP_NETWORK_MEMORY
+          value: "500"
+        - name: ON_HEAP_FACTOR
+          value: "3.0/5"
+        ports:
+          - containerPort: 6666
+            name: metric
+          - containerPort: 9610
+            name: metrics
+          - containerPort: 44707
+            name: dataport

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: repo_name-service-monitor-prod
+  namespace: flink-assignment
+  labels:
+    app: flink
+    cluster: repo_name-cluster
+    track: prod
+spec:
+  ports:
+  - name: metrics
+    port: 9610
+  selector:
+    app: flink
+    cluster: repo_name-cluster
+    track: prod

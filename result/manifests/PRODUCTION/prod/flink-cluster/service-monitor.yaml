@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: repo_name-cluster-monitor-prod
+  namespace: flink-assignment
+  labels:
+    app: flink
+    cluster: repo_name-cluster
+    track: prod
+spec:
+  endpoints:
+    - port: metrics
+      scheme: http
+      path: /metrics
+      interval: 60s
+      scrapeTimeout: 59s
+  selector:
+    matchLabels:
+      app: flink
+      cluster: repo_name-cluster
+      track: prod

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo_name-cluster-jobmanager-prod
+  namespace: flink-assignment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      cluster: repo_name-cluster
+      component: jobmanager
+      track: prod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: flink
+        cluster: repo_name-cluster
+        component: jobmanager
+        track: prod
+    spec:
+      containers:
+      - name: jobmanager
+        image: _DOCKER_IMAGE_TAG_
+        imagePullPolicy: Always
+        args: ["jobmanager"]
+        resources:
+          requests:
+            cpu: "100.0"
+            memory: "300Gi"
+          limits:
+            cpu: "100.0"
+            memory: "300Gi"
+        ports:
+        - containerPort: 6123
+          name: rpc
+        - containerPort: 6124
+          name: blob
+        - containerPort: 6125
+          name: query
+        - containerPort: 8081
+          name: ui
+        - containerPort: 9610
+          name: metrics
+        env:
+        - name: JOB_MANAGER_RPC_ADDRESS
+          value: repo_name-cluster-jobmanager-prod
+        - name: HADOOP_USER_NAME
+          value: yarn
+        - name: JOB_MANAGER_MEMORY
+          value: "1000m"
+        - name: HADOOP_CONF_DIR
+          value: "/etc/hadoop/conf"
+        - name: TRACK
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['track']

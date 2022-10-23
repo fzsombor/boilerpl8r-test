@@ -1,0 +1,19 @@
+taskmanager.host: ${TASK_MANAGER_HOST}
+cluster.evenly-spread-out-slots: true
+blob.server.port: 6124
+query.server.port: 6125
+jobmanager.rpc.address: ${JOB_MANAGER_RPC_ADDRESS}
+taskmanager.log.path: ${FLINK_HOME}/log/output.log
+
+taskmanager.numberOfTaskSlots: ${TASK_MANAGER_NUMBER_OF_TASK_SLOTS}
+taskmanager.memory.process.size: ${TASK_MANAGER_MEMORY}m
+taskmanager.memory.flink.size: ${FLINK_MEMORY}m
+taskmanager.memory.jvm-metaspace.size: ${OFF_HEAP_JVM_METASPACE}m
+taskmanager.memory.jvm-overhead.min: ${OFF_HEAP_JVM_OVERHEAD}m
+taskmanager.memory.jvm-overhead.fraction: 0
+taskmanager.memory.framework.off-heap.size: 128m
+taskmanager.memory.task.off-heap.size: 0m
+taskmanager-memory-managed-size: ${OFF_HEAP_MANAGED_FLINK_MEMORY}m
+taskmanager.memory.network.fraction: 0
+taskmanager.memory.network.min: ${OFF_HEAP_NETWORK_MEMORY}m
+taskmanager.memory.network.max: ${OFF_HEAP_NETWORK_MEMORY}m

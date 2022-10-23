@@ -1,0 +1,6 @@
+jobmanager.rpc.address: ${JOB_MANAGER_RPC_ADDRESS}
+jobmanager.memory.process.size: ${JOB_MANAGER_MEMORY}
+blob.server.port: 6124
+query.server.port: 6125
+web.log.path: ${FLINK_HOME}/log/output.log
+cluster.evenly-spread-out-slots: true
